@@ -12,3 +12,4 @@
 /Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.pdb
 /Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.genruntimeconfig.cache
 /Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ref/ConsoleSnake.dll
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.sourcelink.json
