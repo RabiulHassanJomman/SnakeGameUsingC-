@@ -4,9 +4,12 @@ class Game
   private const int BoardWidth = 40;
   private const int BoardHeight = 20;
 
+  private int moveCounter = 0;
+  private int moveDelay = 3;
 
+  private List<Position> snake = new List<Position>();
 
-  private void Initialize()
+  private void DrawConsole()
   {
     Console.CursorVisible = false;
     Console.Clear();
@@ -30,6 +33,14 @@ class Game
     DrawAt(BoardWidth - 1, BoardHeight - 1, "╝");
   }
 
+  private void Initialize()
+  {
+    DrawConsole();
+
+    snake.Add(new Position(BoardWidth / 2, BoardHeight / 2));
+    snake.Add(new Position(BoardWidth / 2 - 1, BoardHeight / 2));
+  }
+
   private void DrawAt(int x, int y, string symbol)
   {
     Console.SetCursorPosition(x, y);
@@ -48,12 +59,28 @@ class Game
 
   private void Update()
   {
+    moveCounter++;
+    if (moveCounter >= moveDelay)
+    {
+      moveCounter = 0;
 
+      Position currentHead = snake[0];
+      snake.Insert(0, new Position(currentHead.x + 1, currentHead.y));
+
+      Position tail = snake[^1];
+      DrawAt(tail.x, tail.y, " ");
+      snake.RemoveAt(snake.Count - 1);
+    }
   }
 
   private void Render()
   {
-    DrawAt(10, 10, "*");
+    foreach (var pos in snake)
+    {
+      DrawAt(pos.x, pos.y, "○");
+    }
+
+    DrawAt(snake[0].x, snake[0].y, "●");
 
     Console.SetCursorPosition(0, BoardHeight + 1);
     Console.Write("Score: 0");
