@@ -1,0 +1,14 @@
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/bin/Debug/net10.0/ConsoleSnake
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/bin/Debug/net10.0/ConsoleSnake.deps.json
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/bin/Debug/net10.0/ConsoleSnake.runtimeconfig.json
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/bin/Debug/net10.0/ConsoleSnake.dll
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/bin/Debug/net10.0/ConsoleSnake.pdb
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.AssemblyInfoInputs.cache
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.AssemblyInfo.cs
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.csproj.CoreCompileInputs.cache
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.dll
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/refint/ConsoleSnake.dll
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.pdb
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ConsoleSnake.genruntimeconfig.cache
+/Users/jomman/Documents/Jomman/Project/ConsoleSnake/obj/Debug/net10.0/ref/ConsoleSnake.dll
