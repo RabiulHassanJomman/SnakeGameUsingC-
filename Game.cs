@@ -8,11 +8,14 @@ class Game
   private int moveDelay = 10;
 
   private enum Direction { LEFT, RIGHT, UP, DOWN };
-  private Direction currentDirection = Direction.RIGHT;
+  private Direction currentDirection;
 
   private List<Position> snake = new List<Position>();
   private Position food;
   private Random random = new Random();
+
+  private enum GameState { Playing, GameOver };
+  private GameState currentState = GameState.Playing;
 
   private int score = 0;
 
@@ -42,6 +45,10 @@ class Game
 
   private void Initialize()
   {
+    currentState = GameState.Playing;
+    snake = new List<Position>();
+    score = 0;
+    currentDirection = Direction.RIGHT;
     DrawConsole();
 
     snake.Add(new Position(BoardWidth / 2, BoardHeight / 2));
@@ -60,27 +67,43 @@ class Game
     if (Console.KeyAvailable)
     {
       var key = Console.ReadKey(true);
-      switch (key.Key)
+      if (currentState == GameState.Playing)
       {
-        case ConsoleKey.LeftArrow:
-          if (currentDirection != Direction.RIGHT)
-            currentDirection = Direction.LEFT;
-          break;
-        case ConsoleKey.RightArrow:
-          if (currentDirection != Direction.LEFT)
-            currentDirection = Direction.RIGHT;
-          break;
-        case ConsoleKey.UpArrow:
-          if (currentDirection != Direction.DOWN)
-            currentDirection = Direction.UP;
-          break;
-        case ConsoleKey.DownArrow:
-          if (currentDirection != Direction.UP)
-            currentDirection = Direction.DOWN;
-          break;
-        case ConsoleKey.Escape:
-          isRunning = false;
-          break;
+        switch (key.Key)
+        {
+          case ConsoleKey.LeftArrow:
+            if (currentDirection != Direction.RIGHT)
+              currentDirection = Direction.LEFT;
+            break;
+          case ConsoleKey.RightArrow:
+            if (currentDirection != Direction.LEFT)
+              currentDirection = Direction.RIGHT;
+            break;
+          case ConsoleKey.UpArrow:
+            if (currentDirection != Direction.DOWN)
+              currentDirection = Direction.UP;
+            break;
+          case ConsoleKey.DownArrow:
+            if (currentDirection != Direction.UP)
+              currentDirection = Direction.DOWN;
+            break;
+          case ConsoleKey.Escape:
+            isRunning = false;
+            break;
+        }
+      }
+      else if (currentState == GameState.GameOver)
+      {
+        switch (key.Key)
+        {
+          case ConsoleKey.R:
+            Restart();
+            break;
+
+          case ConsoleKey.Escape:
+            isRunning = false;
+            break;
+        }
       }
     }
   }
@@ -105,16 +128,17 @@ class Game
 
   private bool IsCollidingWithWall(Position head)
   {
-    if (head.x <= 0 || head.x >= BoardWidth - 1 || head.y <= 0 || head.y >= BoardHeight - 1) { return true; }
+    if (head.x <= 0 || head.x >= BoardWidth - 1 ||
+        head.y <= 0 || head.y >= BoardHeight - 1) return true;
     else return false;
   }
 
   private bool IsCollidingWithBody(Position head)
   {
-    for (int i = 0; i < snake.Count - 1; i++)
+    for (int i = 0; i < snake.Count - 1; i++)  // Back to i = 0
     {
       Position segment = snake[i];
-      if (segment.x == head.x && segment.y == head.y) { return true; }
+      if (segment.x == head.x && segment.y == head.y) return true;
     }
     return false;
   }
@@ -124,8 +148,19 @@ class Game
     return food.x == snake[0].x && food.y == snake[0].y;
   }
 
+  private void DrawGameOver()
+  {
+    int cx = BoardWidth / 2;
+    int cy = BoardHeight / 2;
+
+    DrawAt(cx - 5, cy - 1, "GAME OVER");
+    DrawAt(cx - 7, cy, "Final Score: " + score);
+    DrawAt(cx - 9, cy + 1, "R = Restart | ESC = Quit");
+  }
+
   private void Update()
   {
+    if (currentState != GameState.Playing) return;
     moveCounter++;
     if (moveCounter >= moveDelay)
     {
@@ -155,7 +190,8 @@ class Game
 
       if (IsCollidingWithBody(newHead) || IsCollidingWithWall(newHead))
       {
-        isRunning = false; return;
+        currentState = GameState.GameOver;
+        return;
       }
       snake.Insert(0, newHead);
 
@@ -175,17 +211,21 @@ class Game
     }
   }
 
+  private void Restart() { Initialize(); }
 
   private void Render()
   {
-    foreach (var pos in snake)
+    if (currentState == GameState.Playing)
     {
-      DrawAt(pos.x, pos.y, "○");
+      foreach (var pos in snake)
+      {
+        DrawAt(pos.x, pos.y, "○");
+      }
+
+      DrawAt(snake[0].x, snake[0].y, "●");
+      DrawAt(food.x, food.y, "◙");
     }
-
-    DrawAt(snake[0].x, snake[0].y, "●");
-    DrawAt(food.x, food.y, "◙");
-
+    else if (currentState == GameState.GameOver) { DrawGameOver(); }
     Console.SetCursorPosition(0, BoardHeight + 1);
     Console.Write("Score: " + score);
   }
