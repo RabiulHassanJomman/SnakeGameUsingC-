@@ -1,7 +1,14 @@
-class Program{
-  public static void Main(){
-    Game game = new Game();
+using Avalonia;
 
-    game.Run();
+class Program
+{
+  public static AppBuilder BuildAvaloniaApp()
+  {
+    return AppBuilder.Configure<App>().UsePlatformDetect().LogToTrace();
+  }
+
+  public static void Main(string[] arg)
+  {
+    BuildAvaloniaApp().StartWithClassicDesktopLifetime(arg);
   }
 }
