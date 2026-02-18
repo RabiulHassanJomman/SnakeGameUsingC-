@@ -30,7 +30,7 @@ class Game
     snake.Add(new Position(BoardWidth / 2 - 1, BoardHeight / 2));
     SpawnFood();
 
-    moveDelay = Math.Max(3, 15 - score);
+    moveDelay = 15;
   }
 
   private bool IsFoodOnTheSnake()
@@ -118,7 +118,7 @@ class Game
       else
       {
         score++;
-        moveDelay = Math.Max(3, 15 - score);
+        moveDelay = Math.Max(8, 15 - score);
 
         SpawnFood();
       }
