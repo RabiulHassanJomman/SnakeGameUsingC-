@@ -12,6 +12,9 @@ public class MainWindow : Window
     private Game game;
     private TextBlock scoreLebel;
 
+    private double moveProgress = 0;
+    private List<(double X, double Y)> prevPositions = new();
+
     public MainWindow()
     {
         Title = "Snake";
@@ -22,7 +25,7 @@ public class MainWindow : Window
         game.Initialize();
 
         var timer = new DispatcherTimer();
-        timer.Interval = TimeSpan.FromMilliseconds(16);
+        timer.Interval = TimeSpan.FromMilliseconds(5);
         timer.Tick += OnTick;
         timer.Start();
 
@@ -33,7 +36,8 @@ public class MainWindow : Window
             Background = Brushes.Black,
         };
 
-        scoreLebel = new TextBlock{
+        scoreLebel = new TextBlock
+        {
             Text = "Score: 0    Best: 0",
             Foreground = Brushes.White,
             FontSize = 18,
@@ -60,25 +64,56 @@ public class MainWindow : Window
         Canvas.SetTop(rect, y * CellSize);
         canvas.Children.Add(rect);
     }
+    private void DrawCellAt(double x, double y, IBrush color)
+    {
+        var rect = new Rectangle
+        {
+            Width = CellSize,
+            Height = CellSize,
+            Fill = color
+        };
+        Canvas.SetLeft(rect, x);
+        Canvas.SetTop(rect, y);
+        canvas.Children.Add(rect);
+    }
     private void Draw()
     {
         canvas.Children.Clear();
+        DrawBorder();
 
         DrawCell(game.food.X, game.food.Y, Brushes.Red);
 
-        for (int i = 1; i < game.snake.Count; i++)
+        for (int i = 0; i < game.snake.Count; i++)
         {
-            DrawCell(game.snake[i].X, game.snake[i].Y, Brushes.LimeGreen);
+            double targetX = game.snake[i].X * CellSize;
+            double targetY = game.snake[i].Y * CellSize;
+
+            double prevX = i < prevPositions.Count ? prevPositions[i].X : targetX;
+            double prevY = i < prevPositions.Count ? prevPositions[i].Y : targetY;
+
+            double vx = prevX + (targetX - prevX) * moveProgress;
+            double vy = prevY + (targetY - prevY) * moveProgress;
+
+            IBrush color = (i == 0) ? Brushes.Green : Brushes.LimeGreen;
+            DrawCellAt(vx, vy, color);
         }
 
-        DrawCell(game.snake[0].X, game.snake[0].Y, Brushes.Green);
-
-        if(game.currentState == Game.GameState.GameOver)
+        if (game.currentState == Game.GameState.GameOver)
             DrawGameOver();
     }
     private void OnTick(object? sender, EventArgs e)
     {
-        game.Update();
+        moveProgress += 1.0 / game.moveDelay;
+
+        if (moveProgress >= 1.0)
+        {
+            prevPositions = game.snake
+                .Select(p => ((double)(p.X * CellSize), (double)(p.Y * CellSize)))
+                .ToList();
+            game.Update();
+            moveProgress -= 1.0;
+        }
+
         Draw();
         scoreLebel.Text = $"Score: {game.score}     Best: {game.highScore}";
     }
@@ -117,6 +152,10 @@ public class MainWindow : Window
             {
                 case Key.R:
                     game.Restart();
+                    moveProgress = 0;
+                    prevPositions = game.snake
+                        .Select(p => ((double)(p.X * CellSize), (double)(p.Y * CellSize)))
+                        .ToList();
                     break;
 
                 case Key.Escape:
@@ -127,8 +166,10 @@ public class MainWindow : Window
         base.OnKeyDown(e);
     }
 
-    private void DrawGameOver(){
-        var overlay = new TextBlock{
+    private void DrawGameOver()
+    {
+        var overlay = new TextBlock
+        {
             Text = $"GAME OVER\nScore: {game.score}     Best: {game.highScore} \n\n R = Restart     ESC = Quit",
             Foreground = Brushes.White,
             FontSize = 20,
@@ -136,8 +177,22 @@ public class MainWindow : Window
             TextAlignment = TextAlignment.Center
         };
 
-        Canvas.SetLeft(overlay, Game.BoardWidth * CellSize /2 - 120);
-        Canvas.SetTop(overlay, Game.BoardHeight * CellSize /2 - 50);
+        Canvas.SetLeft(overlay, Game.BoardWidth * CellSize / 2 - 120);
+        Canvas.SetTop(overlay, Game.BoardHeight * CellSize / 2 - 50);
         canvas.Children.Add(overlay);
+    }
+    private void DrawBorder()
+    {
+        for (int x = 0; x < Game.BoardWidth; x++)
+        {
+            DrawCell(x, 0, Brushes.SlateGray);
+            DrawCell(x, Game.BoardHeight - 1, Brushes.SlateGray);
+        }
+
+        for (int y = 1; y < Game.BoardHeight - 1; y++)
+        {
+            DrawCell(0, y, Brushes.SlateGray);
+            DrawCell(Game.BoardWidth - 1, y, Brushes.SlateGray);
+        }
     }
 }

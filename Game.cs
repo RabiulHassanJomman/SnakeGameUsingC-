@@ -3,8 +3,7 @@ class Game
   public const int BoardWidth = 40;
   public const int BoardHeight = 20;
 
-  private int moveCounter = 0;
-  private int moveDelay = 10;
+  public int moveDelay = 10;
 
   public enum Direction { LEFT, RIGHT, UP, DOWN };
   public Direction currentDirection;
@@ -30,7 +29,7 @@ class Game
     snake.Add(new Position(BoardWidth / 2 - 1, BoardHeight / 2));
     SpawnFood();
 
-    moveDelay = 15;
+    moveDelay = 30;
   }
 
   private bool IsFoodOnTheSnake()
@@ -75,57 +74,52 @@ class Game
   public void Update()
   {
     if (currentState != GameState.Playing) return;
-    moveCounter++;
-    if (moveCounter >= moveDelay)
+
+    int dx = 0, dy = 0;
+    switch (currentDirection)
     {
-      moveCounter = 0;
+      case Direction.LEFT:
+        dx = -1;
+        break;
+      case Direction.RIGHT:
+        dx = 1;
+        break;
 
-      int dx = 0, dy = 0;
-      switch (currentDirection)
-      {
-        case Direction.LEFT:
-          dx = -1;
-          break;
-        case Direction.RIGHT:
-          dx = 1;
-          break;
+      case Direction.UP:
+        dy = -1;
+        break;
 
-        case Direction.UP:
-          dy = -1;
-          break;
+      case Direction.DOWN:
+        dy = 1;
+        break;
+    }
 
-        case Direction.DOWN:
-          dy = 1;
-          break;
-      }
+    Position currentHead = snake[0];
+    Position newHead = new Position(currentHead.X + dx, currentHead.Y + dy);
 
-      Position currentHead = snake[0];
-      Position newHead = new Position(currentHead.X + dx, currentHead.Y + dy);
+    if (IsCollidingWithBody(newHead) || IsCollidingWithWall(newHead))
+    {
+      if (score > highScore) highScore = score;
+      currentState = GameState.GameOver;
+      return;
+    }
+    snake.Insert(0, newHead);
 
-      if (IsCollidingWithBody(newHead) || IsCollidingWithWall(newHead))
-      {
-        if (score > highScore) highScore = score;
-        currentState = GameState.GameOver;
-        return;
-      }
-      snake.Insert(0, newHead);
+    if (!DidFoodEaten())
+    {
+      Position tail = snake[^1];
+      snake.RemoveAt(snake.Count - 1);
+    }
+    else
+    {
+      score++;
+      moveDelay = Math.Max(20, 30 - score);
 
-      if (!DidFoodEaten())
-      {
-        Position tail = snake[^1];
-        snake.RemoveAt(snake.Count - 1);
-      }
-      else
-      {
-        score++;
-        moveDelay = Math.Max(8, 15 - score);
-
-        SpawnFood();
-      }
+      SpawnFood();
     }
   }
 
   public void Restart() { Initialize(); }
 
-  
+
 }
