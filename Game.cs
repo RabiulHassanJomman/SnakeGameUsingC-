@@ -1,114 +1,36 @@
 class Game
 {
-  private bool isRunning = true;
-  private const int BoardWidth = 40;
-  private const int BoardHeight = 20;
+  public const int BoardWidth = 40;
+  public const int BoardHeight = 20;
 
   private int moveCounter = 0;
   private int moveDelay = 10;
 
-  private enum Direction { LEFT, RIGHT, UP, DOWN };
-  private Direction currentDirection;
+  public enum Direction { LEFT, RIGHT, UP, DOWN };
+  public Direction currentDirection;
 
-  private List<Position> snake = new List<Position>();
-  private Position food;
-  private Random random = new Random();
+  public List<Position> snake = new List<Position>();
+  public Position food;
+  public Random random = new Random();
 
-  private enum GameState { Playing, GameOver };
-  private GameState currentState = GameState.Playing;
+  public enum GameState { Playing, GameOver };
+  public GameState currentState = GameState.Playing;
 
-  private int score = 0;
-  private int highScore = 0;
+  public int score = 0;
+  public int highScore = 0;
 
-  private void DrawConsole()
-  {
-    Console.CursorVisible = false;
-    Console.Clear();
-    Console.Title = "Snake Game";
-
-    for (int i = 0; i < BoardHeight; i++)
-    {
-      DrawAt(0, i, "║");
-      DrawAt(BoardWidth - 1, i, "║");
-    }
-
-    for (int i = 0; i < BoardWidth; i++)
-    {
-      DrawAt(i, 0, "═");
-      DrawAt(i, BoardHeight - 1, "═");
-    }
-
-    DrawAt(0, 0, "╔");
-    DrawAt(BoardWidth - 1, 0, "╗");
-    DrawAt(0, BoardHeight - 1, "╚");
-    DrawAt(BoardWidth - 1, BoardHeight - 1, "╝");
-  }
-
-  private void Initialize()
+  public void Initialize()
   {
     currentState = GameState.Playing;
     snake = new List<Position>();
     score = 0;
     currentDirection = Direction.RIGHT;
-    DrawConsole();
 
     snake.Add(new Position(BoardWidth / 2, BoardHeight / 2));
     snake.Add(new Position(BoardWidth / 2 - 1, BoardHeight / 2));
     SpawnFood();
 
     moveDelay = Math.Max(3, 15 - score);
-  }
-
-  private void DrawAt(int x, int y, string symbol)
-  {
-    Console.SetCursorPosition(x, y);
-    Console.Write(symbol);
-  }
-
-  private void ProcessInput()
-  {
-    if (Console.KeyAvailable)
-    {
-      var key = Console.ReadKey(true);
-      if (currentState == GameState.Playing)
-      {
-        switch (key.Key)
-        {
-          case ConsoleKey.LeftArrow:
-            if (currentDirection != Direction.RIGHT)
-              currentDirection = Direction.LEFT;
-            break;
-          case ConsoleKey.RightArrow:
-            if (currentDirection != Direction.LEFT)
-              currentDirection = Direction.RIGHT;
-            break;
-          case ConsoleKey.UpArrow:
-            if (currentDirection != Direction.DOWN)
-              currentDirection = Direction.UP;
-            break;
-          case ConsoleKey.DownArrow:
-            if (currentDirection != Direction.UP)
-              currentDirection = Direction.DOWN;
-            break;
-          case ConsoleKey.Escape:
-            isRunning = false;
-            break;
-        }
-      }
-      else if (currentState == GameState.GameOver)
-      {
-        switch (key.Key)
-        {
-          case ConsoleKey.R:
-            Restart();
-            break;
-
-          case ConsoleKey.Escape:
-            isRunning = false;
-            break;
-        }
-      }
-    }
   }
 
   private bool IsFoodOnTheSnake()
@@ -150,18 +72,7 @@ class Game
     return food.X == snake[0].X && food.Y == snake[0].Y;
   }
 
-  private void DrawGameOver()
-  {
-    int cx = BoardWidth / 2;
-    int cy = BoardHeight / 2;
-
-    DrawAt(cx - 5, cy - 1, "GAME OVER");
-    DrawAt(cx - 7, cy, "Score:      " + score);
-    DrawAt(cx - 7, cy + 1, "Best Score: " + highScore);
-    DrawAt(cx - 9, cy + 2, "R = Restart | ESC = Quit");
-  }
-
-  private void Update()
+  public void Update()
   {
     if (currentState != GameState.Playing) return;
     moveCounter++;
@@ -202,7 +113,6 @@ class Game
       if (!DidFoodEaten())
       {
         Position tail = snake[^1];
-        DrawAt(tail.X, tail.Y, " ");
         snake.RemoveAt(snake.Count - 1);
       }
       else
@@ -210,40 +120,12 @@ class Game
         score++;
         moveDelay = Math.Max(3, 15 - score);
 
-        DrawAt(food.X, food.Y, " ");
         SpawnFood();
       }
     }
   }
 
-  private void Restart() { Initialize(); }
+  public void Restart() { Initialize(); }
 
-  private void Render()
-  {
-    if (currentState == GameState.Playing)
-    {
-      foreach (var pos in snake)
-      {
-        DrawAt(pos.X, pos.Y, "○");
-      }
-
-      DrawAt(snake[0].X, snake[0].Y, "●");
-      DrawAt(food.X, food.Y, "◙");
-    }
-    else if (currentState == GameState.GameOver) { DrawGameOver(); }
-    Console.SetCursorPosition(0, BoardHeight + 1);
-    Console.Write("Score: " + score);
-  }
-
-  public void Run()
-  {
-    Initialize();
-    while (isRunning)
-    {
-      ProcessInput();
-      Update();
-      Render();
-      Thread.Sleep(10);
-    }
-  }
+  
 }
