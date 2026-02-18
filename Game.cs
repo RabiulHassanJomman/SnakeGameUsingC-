@@ -7,6 +7,9 @@ class Game
   private int moveCounter = 0;
   private int moveDelay = 3;
 
+  private enum Direction { LEFT, RIGHT, UP, DOWN };
+  private Direction currentDirection = Direction.LEFT;
+
   private List<Position> snake = new List<Position>();
 
   private void DrawConsole()
@@ -52,8 +55,28 @@ class Game
     if (Console.KeyAvailable)
     {
       var key = Console.ReadKey(true);
-      if (key.Key == ConsoleKey.Escape)
-        isRunning = false;
+      switch (key.Key)
+      {
+        case ConsoleKey.LeftArrow:
+          if (currentDirection != Direction.RIGHT)
+            currentDirection = Direction.LEFT;
+          break;
+        case ConsoleKey.RightArrow:
+          if (currentDirection != Direction.LEFT)
+            currentDirection = Direction.RIGHT;
+          break;
+        case ConsoleKey.UpArrow:
+          if (currentDirection != Direction.DOWN)
+            currentDirection = Direction.UP;
+          break;
+        case ConsoleKey.DownArrow:
+          if (currentDirection != Direction.UP)
+            currentDirection = Direction.DOWN;
+          break;
+        case ConsoleKey.Escape:
+          isRunning = false;
+          break;
+      }
     }
   }
 
@@ -64,8 +87,27 @@ class Game
     {
       moveCounter = 0;
 
+      int dx = 0, dy = 0;
+      switch (currentDirection)
+      {
+        case Direction.LEFT:
+          dx = -1;
+          break;
+        case Direction.RIGHT:
+          dx = 1;
+          break;
+
+        case Direction.UP:
+          dy = -1;
+          break;
+
+        case Direction.DOWN:
+          dy = 1;
+          break;
+      }
+
       Position currentHead = snake[0];
-      snake.Insert(0, new Position(currentHead.x + 1, currentHead.y));
+      snake.Insert(0, new Position(currentHead.x + dx, currentHead.y + dy));
 
       Position tail = snake[^1];
       DrawAt(tail.x, tail.y, " ");
