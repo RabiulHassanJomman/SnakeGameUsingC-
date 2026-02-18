@@ -1,11 +1,11 @@
-class Position
+struct Position
 {
-  public int x;
-  public int y;
+  public int X { get; set; }
+  public int Y { get; set; }
 
   public Position(int x, int y)
   {
-    this.x = x;
-    this.y = y;
+    X = x;
+    Y = y;
   }
 }

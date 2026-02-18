@@ -18,6 +18,7 @@ class Game
   private GameState currentState = GameState.Playing;
 
   private int score = 0;
+  private int highScore = 0;
 
   private void DrawConsole()
   {
@@ -54,6 +55,8 @@ class Game
     snake.Add(new Position(BoardWidth / 2, BoardHeight / 2));
     snake.Add(new Position(BoardWidth / 2 - 1, BoardHeight / 2));
     SpawnFood();
+
+    moveDelay = Math.Max(3, 15 - score);
   }
 
   private void DrawAt(int x, int y, string symbol)
@@ -112,7 +115,7 @@ class Game
   {
     foreach (var segment in snake)
     {
-      if (segment.x == food.x && segment.y == food.y)
+      if (segment.X == food.X && segment.Y == food.Y)
         return true;
     }
     return false;
@@ -128,24 +131,23 @@ class Game
 
   private bool IsCollidingWithWall(Position head)
   {
-    if (head.x <= 0 || head.x >= BoardWidth - 1 ||
-        head.y <= 0 || head.y >= BoardHeight - 1) return true;
-    else return false;
+    return head.X <= 0 || head.X >= BoardWidth - 1 ||
+        head.Y <= 0 || head.Y >= BoardHeight - 1;
   }
 
   private bool IsCollidingWithBody(Position head)
   {
-    for (int i = 0; i < snake.Count - 1; i++)  // Back to i = 0
+    for (int i = 0; i < snake.Count - 1; i++)
     {
       Position segment = snake[i];
-      if (segment.x == head.x && segment.y == head.y) return true;
+      if (segment.X == head.X && segment.Y == head.Y) return true;
     }
     return false;
   }
 
   private bool DidFoodEaten()
   {
-    return food.x == snake[0].x && food.y == snake[0].y;
+    return food.X == snake[0].X && food.Y == snake[0].Y;
   }
 
   private void DrawGameOver()
@@ -154,8 +156,9 @@ class Game
     int cy = BoardHeight / 2;
 
     DrawAt(cx - 5, cy - 1, "GAME OVER");
-    DrawAt(cx - 7, cy, "Final Score: " + score);
-    DrawAt(cx - 9, cy + 1, "R = Restart | ESC = Quit");
+    DrawAt(cx - 7, cy, "Score:      " + score);
+    DrawAt(cx - 7, cy + 1, "Best Score: " + highScore);
+    DrawAt(cx - 9, cy + 2, "R = Restart | ESC = Quit");
   }
 
   private void Update()
@@ -186,10 +189,11 @@ class Game
       }
 
       Position currentHead = snake[0];
-      Position newHead = new Position(currentHead.x + dx, currentHead.y + dy);
+      Position newHead = new Position(currentHead.X + dx, currentHead.Y + dy);
 
       if (IsCollidingWithBody(newHead) || IsCollidingWithWall(newHead))
       {
+        if (score > highScore) highScore = score;
         currentState = GameState.GameOver;
         return;
       }
@@ -198,14 +202,15 @@ class Game
       if (!DidFoodEaten())
       {
         Position tail = snake[^1];
-        DrawAt(tail.x, tail.y, " ");
+        DrawAt(tail.X, tail.Y, " ");
         snake.RemoveAt(snake.Count - 1);
       }
       else
       {
         score++;
+        moveDelay = Math.Max(3, 15 - score);
 
-        DrawAt(food.x, food.y, " ");
+        DrawAt(food.X, food.Y, " ");
         SpawnFood();
       }
     }
@@ -219,11 +224,11 @@ class Game
     {
       foreach (var pos in snake)
       {
-        DrawAt(pos.x, pos.y, "○");
+        DrawAt(pos.X, pos.Y, "○");
       }
 
-      DrawAt(snake[0].x, snake[0].y, "●");
-      DrawAt(food.x, food.y, "◙");
+      DrawAt(snake[0].X, snake[0].Y, "●");
+      DrawAt(food.X, food.Y, "◙");
     }
     else if (currentState == GameState.GameOver) { DrawGameOver(); }
     Console.SetCursorPosition(0, BoardHeight + 1);
